@@ -21,6 +21,8 @@
 6. Karty z balíčku jsou přidány do uživatelovy kolekce.
 7. Uživatel může prohlížet nové karty.
 
+![Activity diagram - open pack](resources/activity-diagram-open-card-pack.png)
+
 ## Scenario 2: Trade Cards
 - Název: Vydání karty na prodej na burze
 - Aktéři: Uživatel, Systém
@@ -36,6 +38,8 @@
 6. Karta je nyní viditelná pro ostatní uživatele v marketplace.
 Alternativní scénář:
 - Pokud je zadaná cena nižší než minimální cena prodeje, systém zobrazí zprávu „Cena je příliš nízká“ a umožní uživateli zadat novou cenu.
+
+![Activity diagram - trade](resources/activity-diagram-auction.png)
 
 ## Scenario 3: Trade Cards
 - Název: Realtime obchodování s kartami
@@ -65,3 +69,5 @@ Alternativní scénář:
 Alternativní scénář:
 - Pokud jedno z uživatelských hesel není správné, systém zobrazí zprávu „Chybná hesla“ a obchod se nezrealizuje, dokud nebude zadáno správné heslo obou uživatelů.
 - Pokud se jeden z uživatelů rozhodne obchod odmítnout, může kliknout na tlačítko „Zrušit obchod“, což odemkne karty pro další použití.
+
+![Activity diagram - trade](resources/activity-diagram-trade.png)
