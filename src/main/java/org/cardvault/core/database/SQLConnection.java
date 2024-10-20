@@ -10,6 +10,7 @@ public class SQLConnection {
     public static Connection connect() {
         Connection connection = null;
         try {
+
             String url = "jdbc:sqlite:db/cardvault.db";
             connection = DriverManager.getConnection(url);
             System.out.println("Connected to SQLite database.");
