@@ -1,18 +1,37 @@
 package org.cardvault.core.routing;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import lombok.Getter;
+import org.cardvault.core.dependencyInjection.annotations.Injected;
+import org.cardvault.core.logging.Logger;
 import org.cardvault.core.routing.annotations.Route;
+import org.cardvault.core.routing.annotations.Authorized;
 import org.cardvault.core.routing.annotations.Controller;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ControllerRouter {
-    private Map<String, HttpHandler> routes = new HashMap<>();
-    private Map<Class<?>, Object> controllerInstances = new HashMap<>();
+    @Getter
+    private final Map<String, HttpHandler> routes = new HashMap<>();
+    @Getter
+    private final Map<Class<?>, Object> controllerInstances = new HashMap<>();
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    private AuthHandler authHandler;
+    @Injected
+    public void setAuthHandler(AuthHandler authHandler) {
+        this.authHandler = authHandler;
+    }
+
+    public ControllerRouter() {}
 
     public void registerController(Class<?> controllerClass) {
         try {
@@ -33,9 +52,28 @@ public class ControllerRouter {
 
                     routes.put(path + "::" + httpMethod, exchange -> {
                         try {
-                            method.invoke(controllerInstance, exchange);
+                            if (method.isAnnotationPresent(Authorized.class) && !isAuthorized(exchange)) {
+                                sendResponse(exchange, Response.error(401, "Unauthorized"));
+                                return;
+                            }
+
+                            Object[] params;
+                            try {
+                                params = mapParameters(method, exchange);
+                            } catch (IOException e) {
+                                Logger.error("Parameter mapping error: " + e.getMessage());
+                                sendResponse(exchange, Response.error(400, "Bad Request"));
+                                return;
+                            }
+
+                            Object result = method.invoke(controllerInstance, params);
+
+                            if (result instanceof Response response) {
+                                sendResponse(exchange, response);
+                            }
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            Logger.error(e.toString());
+                            sendResponse(exchange, Response.error(500, "Internal Server Error"));
                         }
                     });
                 }
@@ -43,8 +81,42 @@ public class ControllerRouter {
 
             controllerInstances.put(controllerClass, controllerInstance);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
+    }
+
+    private boolean isAuthorized(HttpExchange exchange) {
+        String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Basic ")) {
+            return false;
+        }
+
+        return authHandler.verifyCredentials(authHeader);
+    }
+
+    private Object[] mapParameters(Method method, HttpExchange exchange) throws IOException {
+        Parameter[] parameters = method.getParameters();
+        Object[] args = new Object[parameters.length];
+
+        for (int i = 0; i < parameters.length; i++) {
+            Class<?> paramType = parameters[i].getType();
+
+            if (paramType.isAssignableFrom(HttpExchange.class)) {
+                args[i] = exchange;
+            } else {
+                InputStream requestBody = exchange.getRequestBody();
+                String body = new String(requestBody.readAllBytes(), StandardCharsets.UTF_8);
+                args[i] = objectMapper.readValue(body, paramType);
+            }
+        }
+
+        return args;
+    }
+
+    private void sendResponse(HttpExchange exchange, Response response) throws IOException {
+        exchange.sendResponseHeaders(response.getStatus(), response.getBody().getBytes().length);
+        exchange.getResponseBody().write(response.getBody().getBytes());
+        exchange.getResponseBody().close();
     }
 
     public void handleRequest(HttpExchange exchange) throws IOException {
@@ -55,18 +127,7 @@ public class ControllerRouter {
         if (handler != null) {
             handler.handle(exchange);
         } else {
-            String response = "404 Not Found";
-            exchange.sendResponseHeaders(404, response.getBytes().length);
-            exchange.getResponseBody().write(response.getBytes());
-            exchange.getResponseBody().close();
+            sendResponse(exchange, Response.error(404, "404 Not Found"));
         }
-    }
-
-    public Map<String, HttpHandler> getRoutes() {
-        return routes;
-    }
-
-    public Map<Class<?>, Object> getControllerInstances() {
-        return controllerInstances;
     }
 }

@@ -1,5 +1,6 @@
 package org.cardvault.user.repository;
 
+import lombok.NonNull;
 import org.cardvault.core.database.SQLConnectionPool;
 import org.cardvault.core.dependencyInjection.annotations.Injected;
 import org.cardvault.user.dto.User;
@@ -34,6 +35,11 @@ public class UserRepository {
             System.out.println("Error saving user: " + e.getMessage());
         }
         return user;
+    }
+
+    public boolean verifyCredentials(@NonNull final String username, @NonNull final String password) {
+        //check if user exists in database
+        return true;
     }
 
 }

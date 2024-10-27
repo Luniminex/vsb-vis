@@ -3,6 +3,7 @@ package org.cardvault.core.server;
 import com.sun.net.httpserver.HttpServer;
 import org.cardvault.core.database.SQLConnectionPool;
 import org.cardvault.core.dependencyInjection.DIContainer;
+import org.cardvault.core.routing.AuthHandler;
 import org.cardvault.core.routing.ControllerRouter;
 import org.cardvault.core.startup.Config;
 import org.cardvault.user.controller.UserController;
@@ -47,6 +48,7 @@ public class APIServer {
         diContainer.register(UserRepository.class, new UserRepository());
     }
     private static void registerServices() {
+        diContainer.register(AuthHandler.class, new AuthHandler());
         diContainer.register(UserService.class, new UserService());
     }
 
@@ -59,5 +61,7 @@ public class APIServer {
 
         controllerRouter.getControllerInstances()
                 .forEach((key, controller) -> diContainer.injectDependencies(controller));
+
+        diContainer.injectDependencies(controllerRouter);
     }
 }
