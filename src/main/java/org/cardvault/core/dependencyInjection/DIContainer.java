@@ -1,5 +1,6 @@
 package org.cardvault.core.dependencyInjection;
 
+import org.cardvault.core.dependencyInjection.annotations.Initialization;
 import org.cardvault.core.dependencyInjection.annotations.Injected;
 
 import java.lang.reflect.Method;
@@ -31,7 +32,21 @@ public class DIContainer {
                     try {
                         method.invoke(object, service);
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        }
+    }
+
+    public void init() {
+        for (Object service : services.values()) {
+            for (Method method : service.getClass().getDeclaredMethods()) {
+                if (method.isAnnotationPresent(Initialization.class)) {
+                    try {
+                        method.invoke(service);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
                     }
                 }
             }

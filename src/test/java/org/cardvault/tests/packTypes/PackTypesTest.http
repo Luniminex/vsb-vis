@@ -1,0 +1,15 @@
+GET http://localhost:8000/packs/getbycollection?collection=Explorer's%20Adventure
+Accept: application/json
+Authorization: Basic test test
+
+###
+POST http://localhost:8000/packs/buy
+Content-Type: application/json
+Authorization: Basic test test
+
+{
+  "id": 2,
+  "quantity": 2
+}
+
+###

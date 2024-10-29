@@ -1,7 +1,15 @@
 GET http://localhost:8000/user/get
 Accept: application/json
-Authorization: Basic Přezdívka Heslo
+Authorization: Basic test test
 
+###
+POST http://localhost:8000/user/login
+Content-Type: application/json
+
+{
+  "username": "test",
+  "password": "test"
+}
 
 ###
 POST http://localhost:8000/user/register
@@ -13,3 +21,5 @@ Content-Type: application/json
 }
 
 ###
+GET http://localhost:8000/user/test
+Accept: application/json

@@ -9,6 +9,7 @@ import org.cardvault.core.logging.Logger;
 import org.cardvault.core.routing.annotations.Route;
 import org.cardvault.core.routing.annotations.Authorized;
 import org.cardvault.core.routing.annotations.Controller;
+import org.cardvault.user.data.UserDTO;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -98,31 +99,53 @@ public class ControllerRouter {
         Parameter[] parameters = method.getParameters();
         Object[] args = new Object[parameters.length];
 
+        boolean isAuthorizedMethod = method.isAnnotationPresent(Authorized.class);
+
         for (int i = 0; i < parameters.length; i++) {
-            Class<?> paramType = parameters[i].getType();
+            Parameter parameter = parameters[i];
+            Class<?> paramType = parameter.getType();
 
             if (paramType.isAssignableFrom(HttpExchange.class)) {
                 args[i] = exchange;
+            } else if (isAuthorizedMethod && paramType.isAssignableFrom(UserDTO.class)) {
+                String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
+                args[i] = authHandler.getUserDTOFromAuth(authHeader);
             } else {
-                InputStream requestBody = exchange.getRequestBody();
-                String body = new String(requestBody.readAllBytes(), StandardCharsets.UTF_8);
-                args[i] = objectMapper.readValue(body, paramType);
+                if (!"GET".equalsIgnoreCase(exchange.getRequestMethod())) {
+                    InputStream requestBody = exchange.getRequestBody();
+                    String body = new String(requestBody.readAllBytes(), StandardCharsets.UTF_8);
+                    args[i] = objectMapper.readValue(body, paramType);
+                }
             }
         }
-
         return args;
     }
 
+
+
     private void sendResponse(HttpExchange exchange, Response response) throws IOException {
+        addCorsHeaders(exchange);
         exchange.sendResponseHeaders(response.getStatus(), response.getBody().getBytes().length);
         exchange.getResponseBody().write(response.getBody().getBytes());
         exchange.getResponseBody().close();
+    }
+
+    private void addCorsHeaders(HttpExchange exchange) {
+        exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+        exchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        exchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type, Authorization");
     }
 
     public void handleRequest(HttpExchange exchange) throws IOException {
         String path = exchange.getRequestURI().getPath();
         String method = exchange.getRequestMethod();
         HttpHandler handler = routes.get(path + "::" + method);
+        Logger.debug("Handling request: " + method + " " + path);
+        if ("OPTIONS".equalsIgnoreCase(method)) {
+            addCorsHeaders(exchange);
+            exchange.sendResponseHeaders(204, -1);
+            return;
+        }
 
         if (handler != null) {
             handler.handle(exchange);

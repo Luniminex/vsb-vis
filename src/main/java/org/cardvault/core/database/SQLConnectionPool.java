@@ -5,10 +5,15 @@ import com.zaxxer.hikari.HikariDataSource;
 import lombok.Singular;
 import org.cardvault.core.startup.Config;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Objects;
 
 public class SQLConnectionPool {
 
@@ -24,9 +29,9 @@ public class SQLConnectionPool {
         config.setIdleTimeout(60000);
         config.setMaxLifetime(1800000);
 
-        // Inicializace poolu
         dataSource = new HikariDataSource(config);
     }
+
     public Connection getConnection() throws SQLException {
         return dataSource.getConnection();
     }
@@ -38,18 +43,27 @@ public class SQLConnectionPool {
     }
 
     private static void initializeDatabase(String dbPath) {
-        String url = dbPath;
-        try (Connection conn = DriverManager.getConnection(url)) {
-            if (conn != null) {
-                System.out.println("SQLite database has been initialized at " + dbPath);
-                Statement stmt = conn.createStatement();
-                String createTableSQL = "CREATE TABLE IF NOT EXISTS example_table ("
-                        + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                        + "name TEXT NOT NULL);";
-                stmt.execute(createTableSQL);
+        try (Connection conn = DriverManager.getConnection(dbPath);
+             Statement stmt = conn.createStatement();
+             BufferedReader br = new BufferedReader(new InputStreamReader(
+                     Objects.requireNonNull(SQLConnectionPool.class
+                             .getClassLoader()
+                             .getResourceAsStream("database/schema.sql")))
+             )) {
+
+            StringBuilder sql = new StringBuilder();
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                sql.append(line);
+                if (line.trim().endsWith(";")) {
+                    stmt.executeUpdate(sql.toString());
+                    sql.setLength(0);
+                }
             }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            System.out.println("Database schema created successfully.");
+        } catch (IOException | SQLException e) {
+            System.out.println("Error initializing database: " + e.getMessage());
         }
     }
 }

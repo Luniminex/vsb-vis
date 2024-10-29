@@ -38,6 +38,6 @@ The system will be in use:
 
 ## How
 
-The system will be developed using an agile methodology. This will allow for regular iterations, responding to user feedback,
-and adding new features incrementally. Continuous deployment of new updates will help improve user experience and introduce
+The system will be developed using an agile methodology. This will allow for regular iterations, responding to userDOM feedback,
+and adding new features incrementally. Continuous deployment of new updates will help improve userDOM experience and introduce
 new content, such as card expansions or marketplace features.

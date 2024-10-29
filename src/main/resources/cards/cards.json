@@ -1,0 +1,119 @@
+[
+  {
+    "id": 0,
+    "name": "Frog",
+    "rarity": "Uncommon",
+    "hp": 2,
+    "dmg": 1,
+    "collection": "Explorer's Adventure",
+    "releaseNumber": 0
+  },
+  {
+    "id": 1,
+    "name": "Forest Goblin",
+    "rarity": "Uncommon",
+    "hp": 4,
+    "dmg": 2,
+    "collection": "Explorer's Adventure",
+    "releaseNumber": 1
+  },
+  {
+    "id": 2,
+    "name": "Giant Spider",
+    "rarity": "Rare",
+    "hp": 6,
+    "dmg": 3,
+    "collection": "Explorer's Adventure",
+    "releaseNumber": 2
+  },
+  {
+    "id": 3,
+    "name": "Goblin King",
+    "rarity": "Epic",
+    "hp": 8,
+    "dmg": 4,
+    "collection": "Explorer's Adventure",
+    "releaseNumber": 3
+  },
+  {
+    "id": 4,
+    "name": "Forest Dragon",
+    "rarity": "Legendary",
+    "hp": 15,
+    "dmg": 6,
+    "collection": "Explorer's Adventure",
+    "releaseNumber": 4
+  },
+  {
+    "id": 5,
+    "name": "Frost Wolf",
+    "rarity": "Uncommon",
+    "hp": 3,
+    "dmg": 2,
+    "collection": "Frostbite",
+    "releaseNumber": 5
+  },
+  {
+    "id": 6,
+    "name": "Ice Elemental",
+    "rarity": "Rare",
+    "hp": 5,
+    "dmg": 3,
+    "collection": "Frostbite",
+    "releaseNumber": 6
+  },
+  {
+    "id": 7,
+    "name": "Frost Giant",
+    "rarity": "Epic",
+    "hp": 8,
+    "dmg": 4,
+    "collection": "Frostbite",
+    "releaseNumber": 7
+  },
+  {
+    "id": 8,
+    "name": "Ice Dragon",
+    "rarity": "Legendary",
+    "hp": 12,
+    "dmg": 6,
+    "collection": "Frostbite",
+    "releaseNumber": 8
+  },
+  {
+    "id": 9,
+    "name": "Fire Imp",
+    "rarity": "Uncommon",
+    "hp": 2,
+    "dmg": 2,
+    "collection": "Firestorm",
+    "releaseNumber": 9
+  },
+  {
+    "id": 10,
+    "name": "Fire Elemental",
+    "rarity": "Rare",
+    "hp": 4,
+    "dmg": 3,
+    "collection": "Firestorm",
+    "releaseNumber": 10
+  },
+  {
+    "id": 11,
+    "name": "Fire Giant",
+    "rarity": "Epic",
+    "hp": 7,
+    "dmg": 4,
+    "collection": "Firestorm",
+    "releaseNumber": 11
+  },
+  {
+    "id": 12,
+    "name": "Dragon God",
+    "rarity": "Mythic",
+    "hp": 10,
+    "dmg": 6,
+    "collection": "Firestorm",
+    "releaseNumber": 12
+  }
+]
