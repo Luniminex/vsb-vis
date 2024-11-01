@@ -4,9 +4,8 @@ import org.cardvault.packTypes.data.PackTypeDTO;
 import org.cardvault.user.data.UserDTO;
 
 public class UserPackMapper {
-    public static UserPackDTO fromDOM(UserPackDOM userPackDOM, UserDTO user, PackTypeDTO packType) {
+    public static UserPackDTO fromDOM(UserPackDOM userPackDOM, PackTypeDTO packType) {
         return new UserPackDTO(
-            user,
             packType,
             userPackDOM.quantity()
         );

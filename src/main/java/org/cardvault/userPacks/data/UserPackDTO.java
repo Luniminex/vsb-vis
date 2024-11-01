@@ -5,7 +5,6 @@ import org.cardvault.user.data.UserDTO;
 
 import java.sql.Timestamp;
 
-public record UserPackDTO(UserDTO user,
-                          PackTypeDTO packType,
+public record UserPackDTO(PackTypeDTO packType,
                           int quantity) {
 }

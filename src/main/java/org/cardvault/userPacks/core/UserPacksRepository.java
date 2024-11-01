@@ -22,7 +22,7 @@ public class UserPacksRepository {
     }
 
     public List<UserPackDOM> getUserPacks(String username) {
-        String sql = "SELECT up.id, up.user_id, up.pack_type_id, up.quantity " +
+        String sql = "SELECT up.id, up.pack_type_id, up.quantity " +
                 "FROM user_packs up " +
                 "JOIN users u ON up.user_id = u.id " +
                 "WHERE u.username = ?";
@@ -37,7 +37,6 @@ public class UserPacksRepository {
             while (rs.next()) {
                 UserPackDOM userPack = new UserPackDOM(
                         rs.getInt("id"),
-                        rs.getInt("user_id"),
                         rs.getInt("pack_type_id"),
                         rs.getInt("quantity")
                 );

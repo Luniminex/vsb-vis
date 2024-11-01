@@ -28,7 +28,7 @@ public class UserService {
 
     public UserDTO register(final UserDTO userDTO) {
         UserDOM saved = userRepository.save(UserMapper.toUserDOM(userDTO));
-        return UserMapper.toUserDTO(saved);
+        return saved == null ? null : UserMapper.toUserDTO(saved);
     }
 
     public Response login(final UserDTO userDTO) {

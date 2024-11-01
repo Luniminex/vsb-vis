@@ -39,15 +39,11 @@ public class UserPacksService {
 
     public List<UserPackDTO> getUserPacks(UserDTO userDTO) {
         List<UserPackDOM> userpacks = userPacksRepository.getUserPacks(userDTO.username());
-        userDTO = userService.getUser(userDTO);
-
-        UserDTO finalUserDTO = userDTO;
         return userpacks.stream()
                 .map(userPackDom -> {
                     PackTypeDTO packType = packTypeService.getPackType(userPackDom.packTypeId());
-                    return UserPackMapper.fromDOM(userPackDom, finalUserDTO, packType);
+                    return UserPackMapper.fromDOM(userPackDom, packType);
                 })
                 .toList();
-
     }
 }
