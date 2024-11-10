@@ -20,8 +20,6 @@ public class UserPacksService {
     private UserPacksRepository userPacksRepository;
     private PackTypeService packTypeService;
 
-    private UserService userService;
-
     @Injected
     public void setUserPacksRepository(UserPacksRepository userPacksRepository) {
         this.userPacksRepository = userPacksRepository;
@@ -32,11 +30,6 @@ public class UserPacksService {
         this.packTypeService = packTypeService;
     }
 
-    @Injected
-    public void setUserRepository(UserService userService) {
-        this.userService = userService;
-    }
-
     public List<UserPackDTO> getUserPacks(UserDTO userDTO) {
         List<UserPackDOM> userpacks = userPacksRepository.getUserPacks(userDTO.username());
         return userpacks.stream()
@@ -45,5 +38,9 @@ public class UserPacksService {
                     return UserPackMapper.fromDOM(userPackDom, packType);
                 })
                 .toList();
+    }
+
+    public void removePack(UserDTO userDTO, int id) {
+        userPacksRepository.removePack(userDTO, id);
     }
 }

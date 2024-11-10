@@ -2,7 +2,7 @@
   {
     "id": 0,
     "name": "Frog",
-    "rarity": "Uncommon",
+    "rarity": "Common",
     "hp": 2,
     "dmg": 1,
     "collection": "Explorer's Adventure",

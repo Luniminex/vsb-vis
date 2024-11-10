@@ -4,10 +4,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.cardvault.cards.data.BuyPackDTO;
 import org.cardvault.cards.data.CardDOM;
+import org.cardvault.cards.data.CardRarity;
 import org.cardvault.core.database.SQLConnectionPool;
 import org.cardvault.core.dependencyInjection.annotations.Injected;
 import org.cardvault.core.logging.Logger;
 import org.cardvault.packTypes.data.PackTypeDOM;
+import org.cardvault.user.data.UserDTO;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,10 +17,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class PackTypeRepository {
     private SQLConnectionPool connectionPool;

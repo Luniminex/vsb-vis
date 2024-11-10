@@ -3,6 +3,7 @@ package org.cardvault.userPacks.core;
 import org.cardvault.core.database.SQLConnectionPool;
 import org.cardvault.core.dependencyInjection.annotations.Injected;
 import org.cardvault.core.logging.Logger;
+import org.cardvault.user.data.UserDTO;
 import org.cardvault.userPacks.data.UserPackDOM;
 
 import java.sql.Connection;
@@ -47,6 +48,19 @@ public class UserPacksRepository {
         }
 
         return userPacks;
+    }
+
+    public void removePack(UserDTO userDTO, int id) {
+        String sql = "UPDATE user_packs SET quantity = quantity - 1 WHERE user_id = (SELECT id FROM users WHERE username = ?) AND pack_type_id = ? AND quantity > 0";
+        try (Connection conn = sqlConnectionPool.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, userDTO.username());
+            pstmt.setInt(2, id);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            Logger.error("Error removing pack from user: " + e.getMessage());
+        }
     }
 }
 

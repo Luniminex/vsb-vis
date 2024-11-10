@@ -1,3 +1,12 @@
+POST http://localhost:8000/packs/open
+Content-Type: application/json
+Authorization: Basic test test
+
+{
+  "packTypeId": 0
+}
+
+###
 GET http://localhost:8000/packs/getbycollection?collection=Explorer's%20Adventure
 Accept: application/json
 Authorization: Basic test test

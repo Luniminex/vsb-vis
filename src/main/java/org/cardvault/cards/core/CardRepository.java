@@ -13,8 +13,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public class CardRepository {
 
@@ -31,7 +33,8 @@ public class CardRepository {
         try {
             // Locate the resource
             File file = new File(Objects.requireNonNull(getClass().getClassLoader().getResource(path)).getFile());
-            List<CardDOM> cards = objectMapper.readValue(file, new TypeReference<List<CardDOM>>() {});
+            List<CardDOM> cards = objectMapper.readValue(file, new TypeReference<List<CardDOM>>() {
+            });
 
             // Insert cards into the database if they do not exist
             try (Connection conn = connectionPool.getConnection()) {
@@ -59,5 +62,34 @@ public class CardRepository {
         } catch (IOException | SQLException e) {
             Logger.error("Error loading cards: " + e.getMessage());
         }
+    }
+
+    public Set<CardDOM> getCardsByCollection(String collection) {
+        Set<CardDOM> cards = new HashSet<>();
+        String sql = "SELECT * FROM cards WHERE collection = ?";
+
+        try (Connection conn = connectionPool.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, collection);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                CardDOM card = new CardDOM(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("rarity"),
+                        rs.getInt("hp"),
+                        rs.getInt("dmg"),
+                        rs.getString("collection"),
+                        rs.getInt("release_number")
+                );
+                cards.add(card);
+            }
+        } catch (SQLException e) {
+            Logger.error("Error getting cards by collection: " + e.getMessage());
+        }
+
+        return cards;
     }
 }

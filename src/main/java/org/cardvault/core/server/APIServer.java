@@ -14,6 +14,8 @@ import org.cardvault.packTypes.core.PackTypesController;
 import org.cardvault.user.core.UserController;
 import org.cardvault.user.core.UserRepository;
 import org.cardvault.user.core.UserService;
+import org.cardvault.userCollection.core.UserCollectionRepository;
+import org.cardvault.userCollection.core.UserCollectionService;
 import org.cardvault.userPacks.core.UserPacksController;
 import org.cardvault.userPacks.core.UserPacksRepository;
 import org.cardvault.userPacks.core.UserPacksService;
@@ -57,6 +59,7 @@ public class APIServer {
         diContainer.register(CardRepository.class, new CardRepository());
         diContainer.register(PackTypeRepository.class, new PackTypeRepository());
         diContainer.register(UserPacksRepository.class, new UserPacksRepository());
+        diContainer.register(UserCollectionRepository.class, new UserCollectionRepository());
     }
     private static void registerServices() {
         diContainer.register(AuthHandler.class, new AuthHandler());
@@ -64,6 +67,7 @@ public class APIServer {
         diContainer.register(CardsService.class, new CardsService());
         diContainer.register(PackTypeService.class, new PackTypeService());
         diContainer.register(UserPacksService.class, new UserPacksService());
+        diContainer.register(UserCollectionService.class, new UserCollectionService());
     }
 
     private static void registerHandlers() {

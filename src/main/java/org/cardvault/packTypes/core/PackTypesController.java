@@ -2,6 +2,8 @@ package org.cardvault.packTypes.core;
 
 import com.sun.net.httpserver.HttpExchange;
 import org.cardvault.cards.data.BuyPackDTO;
+import org.cardvault.cards.data.CardDOM;
+import org.cardvault.cards.data.OpenPackDTO;
 import org.cardvault.core.dependencyInjection.annotations.Injected;
 import org.cardvault.core.logging.Logger;
 import org.cardvault.core.routing.Response;
@@ -39,6 +41,20 @@ public class PackTypesController {
         }
     }
 
+    @Route(path ="/open", method = "POST")
+    @Authorized
+    public Response openPack(HttpExchange exchange, UserDTO userDTO, OpenPackDTO openPackDTO) {
+        Logger.debug("Received open pack request.");
+        List<CardDOM> cards = packTypeService.openPack(userDTO, openPackDTO.packTypeId());
+        if(cards != null) {
+            Logger.debug(userDTO.username() + " opened pack " + openPackDTO.packTypeId());
+            return Response.ok(cards);
+        } else {
+            Logger.debug("Failed to open pack.");
+            return Response.error(400, "Failed to open pack.");
+        }
+    }
+
     @Route(path = "/getAll")
     @Authorized
     public Response getAllPacks(HttpExchange exchange) {
@@ -52,11 +68,9 @@ public class PackTypesController {
     public Response getPacksByCollection(HttpExchange exchange) {
         Logger.debug("Received get packs by collection request.");
 
-        // Extract query parameters
         String query = exchange.getRequestURI().getQuery();
         Map<String, String> queryParams = parseQueryParams(query);
 
-        // Get the collection name from the query parameters
         String collectionName = queryParams.get("collection");
 
         if (collectionName == null || collectionName.isEmpty()) {
