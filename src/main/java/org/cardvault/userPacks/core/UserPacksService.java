@@ -24,7 +24,6 @@ public class UserPacksService {
     public void setUserPacksRepository(UserPacksRepository userPacksRepository) {
         this.userPacksRepository = userPacksRepository;
     }
-
     @Injected
     public void setPackTypeRepository(PackTypeService packTypeService) {
         this.packTypeService = packTypeService;
@@ -42,5 +41,9 @@ public class UserPacksService {
 
     public void removePack(UserDTO userDTO, int id) {
         userPacksRepository.removePack(userDTO, id);
+    }
+
+    public boolean hasAtleastOnePackOfType(UserDTO userDTO, int packTypeId) {
+        return userPacksRepository.hasAtleastOnePackOfType(userDTO, packTypeId);
     }
 }

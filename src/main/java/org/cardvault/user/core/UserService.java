@@ -21,7 +21,7 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public UserDTO getUser(final UserDTO userDTO) {
+    public UserDTO get  User(final UserDTO userDTO) {
         UserDOM user = userRepository.getUser(userDTO.username());
         return UserMapper.toUserDTO(user);
     }

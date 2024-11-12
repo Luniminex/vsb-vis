@@ -14,6 +14,7 @@ import org.cardvault.packTypes.core.PackTypesController;
 import org.cardvault.user.core.UserController;
 import org.cardvault.user.core.UserRepository;
 import org.cardvault.user.core.UserService;
+import org.cardvault.userCollection.core.UserCollectionController;
 import org.cardvault.userCollection.core.UserCollectionRepository;
 import org.cardvault.userCollection.core.UserCollectionService;
 import org.cardvault.userPacks.core.UserPacksController;
@@ -74,6 +75,7 @@ public class APIServer {
         controllerRouter.registerController(UserController.class);
         controllerRouter.registerController(PackTypesController.class);
         controllerRouter.registerController(UserPacksController.class);
+        controllerRouter.registerController(UserCollectionController.class);
     }
 
     private static void injectServices() {

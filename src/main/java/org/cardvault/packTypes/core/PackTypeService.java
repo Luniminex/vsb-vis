@@ -59,11 +59,10 @@ public class PackTypeService {
         return PackTypeMapper.toDTO(packTypeRepository.getPackType(id));
     }
 
-    public List<CardDOM> openPack(UserDTO userDTO, int packId) {
+    public List<CardDOM> openPack(final UserDTO userDTO, int packId) {
         PackTypeDOM packType = packTypeRepository.getPackType(packId);
-        userDTO = userService.getUser(userDTO);
 
-        if (!userCollectionService.hasAtleastOnePackOfType(userDTO, packType.id())) {
+        if (!userPacksService.hasAtleastOnePackOfType(userDTO, packType.id())) {
             return List.of();
         }
 
@@ -73,7 +72,10 @@ public class PackTypeService {
         final int noCardsToDraw = packType.cards_per_pack();
 
         userPacksService.removePack(userDTO, packType.id());
-        return drawCards(noCardsToDraw, packChances, packCards);
+        List<CardDOM> drawnCards = drawCards(noCardsToDraw, packChances, packCards);
+
+        drawnCards.forEach(card -> userCollectionService.addCardToCollection(userDTO, card.id()));
+        return drawnCards;
     }
 
     public boolean buyPack(UserDTO userDTO, BuyPackDTO buyPackDTO) {

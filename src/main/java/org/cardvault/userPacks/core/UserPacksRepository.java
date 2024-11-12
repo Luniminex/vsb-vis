@@ -62,5 +62,19 @@ public class UserPacksRepository {
             Logger.error("Error removing pack from user: " + e.getMessage());
         }
     }
+
+    public boolean hasAtleastOnePackOfType(UserDTO userDTO, int packTypeId) {
+        String sql = "SELECT 1 FROM user_packs WHERE user_id = (SELECT id FROM users WHERE username = ?) AND pack_type_id = ? AND quantity > 0 LIMIT 1";
+        try (Connection conn = sqlConnectionPool.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, userDTO.username());
+            pstmt.setInt(2, packTypeId);
+            return pstmt.executeQuery().next();
+        } catch (SQLException e) {
+            Logger.error("Error checking if user has at least one pack of type: " + e.getMessage());
+            return false;
+        }
+    }
 }
 
