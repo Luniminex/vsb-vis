@@ -6,6 +6,7 @@ import org.cardvault.cards.data.CardDOM;
 import org.cardvault.core.database.SQLConnectionPool;
 import org.cardvault.core.dependencyInjection.annotations.Injected;
 import org.cardvault.core.logging.Logger;
+import org.cardvault.core.utils.DefaultObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,7 +23,7 @@ public class CardRepository {
 
     private SQLConnectionPool connectionPool;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = DefaultObjectMapper.createObjectMapper();
 
     @Injected
     public void setSQLConnectionPool(SQLConnectionPool connectionPool) {
@@ -31,12 +32,10 @@ public class CardRepository {
 
     public void loadUpCards(final String path) {
         try {
-            // Locate the resource
             File file = new File(Objects.requireNonNull(getClass().getClassLoader().getResource(path)).getFile());
             List<CardDOM> cards = objectMapper.readValue(file, new TypeReference<List<CardDOM>>() {
             });
 
-            // Insert cards into the database if they do not exist
             try (Connection conn = connectionPool.getConnection()) {
                 for (CardDOM card : cards) {
                     String checkSql = "SELECT 1 FROM cards WHERE id = ? LIMIT 1";

@@ -1,3 +1,8 @@
+GET http://localhost:8000/usercollection/getdata
+Accept: application/json
+Authorization: Basic FETest FETest
+
+###
 GET http://localhost:8000/usercollection/get
 Accept: application/json
 Authorization: Basic test test

@@ -5,6 +5,8 @@ import org.cardvault.core.database.SQLConnectionPool;
 import org.cardvault.core.dependencyInjection.annotations.Injected;
 import org.cardvault.core.logging.Logger;
 import org.cardvault.user.data.UserDTO;
+import org.cardvault.userCollection.data.CollectionData;
+import org.cardvault.userCollection.data.UserCardData;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -60,12 +62,12 @@ public class UserCollectionRepository {
         }
     }
 
-    public List<CardDOM> getUserCollection(String username) {
+    public List<UserCardData> getUserCollection(String username) {
         String sql = "SELECT c.id, c.name, c.rarity, c.hp, c.dmg, c.collection, c.release_number, uc.quantity, uc.first_acquired " +
                 "FROM user_collection uc " +
                 "JOIN cards c ON uc.card_id = c.id " +
                 "WHERE uc.user_id = (SELECT id FROM users WHERE username = ?)";
-        List<CardDOM> userCollection = new ArrayList<>();
+        List<UserCardData> userCollection = new ArrayList<>();
 
         try (Connection conn = connectionPool.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -83,12 +85,56 @@ public class UserCollectionRepository {
                         rs.getString("collection"),
                         rs.getInt("release_number")
                 );
-                userCollection.add(card);
+                UserCardData userCardData = new UserCardData(
+                        card,
+                        rs.getInt("quantity"),
+                        rs.getTimestamp("first_acquired").toLocalDateTime()
+                );
+                userCollection.add(userCardData);
             }
         } catch (SQLException e) {
             Logger.error("Error fetching user collection: " + e.getMessage());
         }
 
         return userCollection;
+    }
+
+    public CollectionData getUserCollectionData(String username) {
+        String sql = "SELECT " +
+                "(SELECT COUNT(DISTINCT id) FROM cards) AS totalCards, " +
+                "SUM(uc.quantity) AS totalCardsCollected, " +
+                "SUM(CASE WHEN c.rarity = 'Common' THEN uc.quantity ELSE 0 END) AS commonCount, " +
+                "SUM(CASE WHEN c.rarity = 'Uncommon' THEN uc.quantity ELSE 0 END) AS uncommonCount, " +
+                "SUM(CASE WHEN c.rarity = 'Rare' THEN uc.quantity ELSE 0 END) AS rareCount, " +
+                "SUM(CASE WHEN c.rarity = 'Epic' THEN uc.quantity ELSE 0 END) AS epicCount, " +
+                "SUM(CASE WHEN c.rarity = 'Legendary' THEN uc.quantity ELSE 0 END) AS legendaryCount, " +
+                "SUM(CASE WHEN c.rarity = 'Mythic' THEN uc.quantity ELSE 0 END) AS mythicCount " +
+                "FROM user_collection uc " +
+                "JOIN cards c ON uc.card_id = c.id " +
+                "WHERE uc.user_id = (SELECT id FROM users WHERE username = ?)";
+
+        try (Connection conn = connectionPool.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, username);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                return new CollectionData(
+                        rs.getInt("totalCards"),
+                        rs.getInt("totalCardsCollected"),
+                        rs.getInt("commonCount"),
+                        rs.getInt("uncommonCount"),
+                        rs.getInt("rareCount"),
+                        rs.getInt("epicCount"),
+                        rs.getInt("legendaryCount"),
+                        rs.getInt("mythicCount")
+                );
+            }
+        } catch (SQLException e) {
+            Logger.error("Error fetching user collection data: " + e.getMessage());
+        }
+
+        return null;
     }
 }

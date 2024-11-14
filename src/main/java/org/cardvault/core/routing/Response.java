@@ -3,13 +3,14 @@ package org.cardvault.core.routing;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
+import org.cardvault.core.utils.DefaultObjectMapper;
 
 @Getter
 public class Response {
-    private int status;
-    private String body;
+    private final int status;
+    private final String body;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = DefaultObjectMapper.createObjectMapper();
 
     public Response(int status, String body) {
         this.status = status;
@@ -32,6 +33,6 @@ public class Response {
     }
 
     private static String convertObjectToJson(Object object) throws JsonProcessingException {
-        return new ObjectMapper().writeValueAsString(object);
+        return DefaultObjectMapper.createObjectMapper().writeValueAsString(object);
     }
 }

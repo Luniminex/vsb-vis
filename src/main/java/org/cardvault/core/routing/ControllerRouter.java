@@ -9,6 +9,7 @@ import org.cardvault.core.logging.Logger;
 import org.cardvault.core.routing.annotations.Route;
 import org.cardvault.core.routing.annotations.Authorized;
 import org.cardvault.core.routing.annotations.Controller;
+import org.cardvault.core.utils.DefaultObjectMapper;
 import org.cardvault.user.data.UserDTO;
 
 import java.io.IOException;
@@ -24,7 +25,7 @@ public class ControllerRouter {
     private final Map<String, HttpHandler> routes = new HashMap<>();
     @Getter
     private final Map<Class<?>, Object> controllerInstances = new HashMap<>();
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = DefaultObjectMapper.createObjectMapper();
 
     private AuthHandler authHandler;
     @Injected
@@ -120,8 +121,6 @@ public class ControllerRouter {
         }
         return args;
     }
-
-
 
     private void sendResponse(HttpExchange exchange, Response response) throws IOException {
         addCorsHeaders(exchange);
