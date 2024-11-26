@@ -1,4 +1,4 @@
-package org.cardvault.cards.data;
+package org.cardvault.packTypes.data;
 
 public record OpenPackDTO(int packTypeId) {
 }

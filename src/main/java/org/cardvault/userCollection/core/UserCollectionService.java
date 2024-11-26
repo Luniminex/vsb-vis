@@ -1,12 +1,10 @@
 package org.cardvault.userCollection.core;
 
-import org.cardvault.cards.data.CardDOM;
 import org.cardvault.core.dependencyInjection.annotations.Injected;
 import org.cardvault.user.core.UserService;
-import org.cardvault.user.data.UserDOM;
 import org.cardvault.user.data.UserDTO;
-import org.cardvault.userCollection.data.CollectionData;
-import org.cardvault.userCollection.data.UserCardData;
+import org.cardvault.userCollection.data.CollectionDataDTO;
+import org.cardvault.userCollection.data.UserCardDataDTO;
 
 import java.util.List;
 
@@ -27,11 +25,11 @@ public class UserCollectionService {
         userCollectionRepository.addCardToCollection(userDTO, cardId);
     }
 
-    public List<UserCardData> getUserCollection(UserDTO userDTO) {
+    public List<UserCardDataDTO> getUserCollection(UserDTO userDTO) {
         return userCollectionRepository.getUserCollection(userDTO.username());
     }
 
-    public CollectionData getUsercollectionData(UserDTO userDTO) {
+    public CollectionDataDTO getUserCollectionData(UserDTO userDTO) {
         return userCollectionRepository.getUserCollectionData(userDTO.username());
     }
 }

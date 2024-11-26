@@ -1,7 +1,6 @@
 package org.cardvault.userCollection.core;
 
 import com.sun.net.httpserver.HttpExchange;
-import org.cardvault.cards.data.CardDOM;
 import org.cardvault.core.dependencyInjection.annotations.Injected;
 import org.cardvault.core.logging.Logger;
 import org.cardvault.core.routing.Response;
@@ -9,8 +8,8 @@ import org.cardvault.core.routing.annotations.Authorized;
 import org.cardvault.core.routing.annotations.Controller;
 import org.cardvault.core.routing.annotations.Route;
 import org.cardvault.user.data.UserDTO;
-import org.cardvault.userCollection.data.CollectionData;
-import org.cardvault.userCollection.data.UserCardData;
+import org.cardvault.userCollection.data.CollectionDataDTO;
+import org.cardvault.userCollection.data.UserCardDataDTO;
 
 import java.util.List;
 
@@ -27,9 +26,8 @@ public class UserCollectionController {
     @Authorized
     public Response getUserCollection(HttpExchange exchange, UserDTO userDTO) {
         Logger.debug("Received get user collection request.");
-        List<UserCardData> userCards = userCollectionService.getUserCollection(userDTO);
+        List<UserCardDataDTO> userCards = userCollectionService.getUserCollection(userDTO);
         if(userCards != null) {
-            Logger.debug(userDTO.username() + " got their collection.");
             return Response.ok(userCards);
         } else {
             Logger.debug("Failed to get user collection.");
@@ -41,7 +39,7 @@ public class UserCollectionController {
     @Authorized
     public Response getUserCollectionData(HttpExchange exchange, UserDTO userDTO) {
         Logger.debug("Received get user collection data request.");
-        CollectionData collectionData = userCollectionService.getUsercollectionData(userDTO);
+        CollectionDataDTO collectionData = userCollectionService.getUserCollectionData(userDTO);
         if(collectionData != null) {
             Logger.debug(userDTO.username() + " got their collection data.");
             return Response.ok(collectionData);

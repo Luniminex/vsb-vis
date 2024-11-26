@@ -26,6 +26,10 @@ public class UserService {
         return UserMapper.toUserDTO(user);
     }
 
+    public UserDOM getDOMUser(final UserDTO userDTO) {
+        return userRepository.getUser(userDTO.username());
+    }
+
     public UserDTO register(final UserDTO userDTO) {
         UserDOM saved = userRepository.save(UserMapper.toUserDOM(userDTO));
         return saved == null ? null : UserMapper.toUserDTO(saved);

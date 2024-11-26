@@ -2,14 +2,11 @@ package org.cardvault.packTypes.core;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.cardvault.cards.data.BuyPackDTO;
-import org.cardvault.cards.data.CardDOM;
-import org.cardvault.cards.data.CardRarity;
+import org.cardvault.packTypes.data.BuyPackDTO;
 import org.cardvault.core.database.SQLConnectionPool;
 import org.cardvault.core.dependencyInjection.annotations.Injected;
 import org.cardvault.core.logging.Logger;
 import org.cardvault.packTypes.data.PackTypeDOM;
-import org.cardvault.user.data.UserDTO;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,7 +14,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 
 public class PackTypeRepository {
     private SQLConnectionPool connectionPool;
@@ -29,15 +29,12 @@ public class PackTypeRepository {
         this.connectionPool = connectionPool;
     }
 
-
     public void loadUpPackTypes(final String path) {
         try {
-            // Locate the resource
             File file = new File(Objects.requireNonNull(getClass().getClassLoader().getResource(path)).getFile());
             List<PackTypeDOM> packTypes = objectMapper.readValue(file, new TypeReference<List<PackTypeDOM>>() {
             });
 
-            // Insert pack types into the database if they do not exist
             try (Connection conn = connectionPool.getConnection()) {
                 for (PackTypeDOM packType : packTypes) {
                     String checkSql = "SELECT 1 FROM pack_types WHERE id = ? LIMIT 1";
@@ -112,26 +109,22 @@ public class PackTypeRepository {
                  PreparedStatement updateStmt = conn.prepareStatement(updateSql);
                  PreparedStatement updateCurrencyStmt = conn.prepareStatement(updateCurrencySql)) {
 
-                // Check if the pack already exists for the user
                 selectStmt.setString(1, username);
                 selectStmt.setInt(2, packType.id());
                 ResultSet rs = selectStmt.executeQuery();
 
                 if (rs.next()) {
-                    // Pack exists, update the quantity
                     int existingPackId = rs.getInt("id");
                     updateStmt.setInt(1, buyPackDTO.quantity());
                     updateStmt.setInt(2, existingPackId);
                     updateStmt.executeUpdate();
                 } else {
-                    // Pack does not exist, insert a new record
                     insertStmt.setString(1, username);
                     insertStmt.setInt(2, packType.id());
                     insertStmt.setInt(3, buyPackDTO.quantity());
                     insertStmt.executeUpdate();
                 }
 
-                // Update user's currency
                 int totalCost = packType.price() * buyPackDTO.quantity();
                 updateCurrencyStmt.setInt(1, totalCost);
                 updateCurrencyStmt.setString(2, username);

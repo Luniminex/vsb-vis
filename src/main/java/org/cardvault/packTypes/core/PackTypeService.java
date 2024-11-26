@@ -1,15 +1,16 @@
 package org.cardvault.packTypes.core;
 
 import org.cardvault.cards.core.CardsService;
-import org.cardvault.cards.data.BuyPackDTO;
 import org.cardvault.cards.data.CardDOM;
 import org.cardvault.cards.data.CardRarity;
 import org.cardvault.core.dependencyInjection.annotations.Initialization;
 import org.cardvault.core.dependencyInjection.annotations.Injected;
+import org.cardvault.packTypes.data.BuyPackDTO;
 import org.cardvault.packTypes.data.PackTypeDOM;
 import org.cardvault.packTypes.data.PackTypeDTO;
 import org.cardvault.packTypes.data.PackTypeMapper;
 import org.cardvault.user.core.UserService;
+import org.cardvault.user.data.UserDOM;
 import org.cardvault.user.data.UserDTO;
 import org.cardvault.userCollection.core.UserCollectionService;
 import org.cardvault.userPacks.core.UserPacksService;
@@ -24,6 +25,7 @@ public class PackTypeService {
     private UserPacksService userPacksService;
     private CardsService cardsService;
     private UserService userService;
+    private static final Random random = new Random();
 
     @Injected
     public void setPackTypeRepository(PackTypeRepository packTypeRepository) {
@@ -80,13 +82,13 @@ public class PackTypeService {
 
     public boolean buyPack(UserDTO userDTO, BuyPackDTO buyPackDTO) {
         PackTypeDOM packType = packTypeRepository.getPackType(buyPackDTO.id());
-        userDTO = userService.getUser(userDTO);
+        UserDOM user = userService.getDOMUser(userDTO);
 
-        if (!hasSufficientFunds(userDTO.currency(), packType.price(), buyPackDTO.quantity())) {
+        if (!hasSufficientFunds(user.currency(), packType.price(), buyPackDTO.quantity())) {
             return false;
         }
 
-        return packTypeRepository.buyPack(userDTO.username(), packType, buyPackDTO);
+        return packTypeRepository.buyPack(user.username(), packType, buyPackDTO);
     }
 
     public List<PackTypeDTO> getPacksByCollection(String collectionName) {
@@ -103,34 +105,47 @@ public class PackTypeService {
 
     private static List<CardDOM> drawCards(int noCardsToDraw, Map<CardRarity, Float> packChances, Map<CardRarity, Set<CardDOM>> packCards) {
         List<CardDOM> selectedCards = new ArrayList<>();
-        Random random = new Random();
-
-        float totalChance = packChances.values().stream().reduce(0.0f, Float::sum);
-        Map<CardRarity, Float> normalizedChances = packChances.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue() / totalChance));
+        Map<CardRarity, Float> normalizedChances = normalizeChances(packChances);
 
         for (int i = 0; i < noCardsToDraw; i++) {
-            float chance = random.nextFloat();
-            float cumulativeChance = 0.0f;
-            CardRarity selectedRarity = null;
-
-            for (Map.Entry<CardRarity, Float> entry : normalizedChances.entrySet()) {
-                cumulativeChance += entry.getValue();
-                if (chance <= cumulativeChance) {
-                    selectedRarity = entry.getKey();
-                    break;
-                }
-            }
-
-            if (selectedRarity != null && packCards.containsKey(selectedRarity)) {
-                List<CardDOM> cardsOfSelectedRarity = new ArrayList<>(packCards.get(selectedRarity));
-                if (!cardsOfSelectedRarity.isEmpty()) {
-                    CardDOM selectedCard = cardsOfSelectedRarity.get(random.nextInt(cardsOfSelectedRarity.size()));
+            CardRarity selectedRarity = selectRarity(normalizedChances);
+            if (selectedRarity != null) {
+                CardDOM selectedCard = selectCardFromRarity(packCards, selectedRarity);
+                if (selectedCard != null) {
                     selectedCards.add(selectedCard);
                 }
             }
         }
         return selectedCards;
+    }
+
+    private static Map<CardRarity, Float> normalizeChances(Map<CardRarity, Float> packChances) {
+        float totalChance = packChances.values().stream().reduce(0.0f, Float::sum);
+        return packChances.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue() / totalChance));
+    }
+
+    private static CardRarity selectRarity(Map<CardRarity, Float> normalizedChances) {
+        float chance = random.nextFloat();
+        float cumulativeChance = 0.0f;
+
+        for (Map.Entry<CardRarity, Float> entry : normalizedChances.entrySet()) {
+            cumulativeChance += entry.getValue();
+            if (chance <= cumulativeChance) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+
+    private static CardDOM selectCardFromRarity(Map<CardRarity, Set<CardDOM>> packCards, CardRarity selectedRarity) {
+        if (packCards.containsKey(selectedRarity)) {
+            List<CardDOM> cardsOfSelectedRarity = new ArrayList<>(packCards.get(selectedRarity));
+            if (!cardsOfSelectedRarity.isEmpty()) {
+                return cardsOfSelectedRarity.get(random.nextInt(cardsOfSelectedRarity.size()));
+            }
+        }
+        return null;
     }
 
     private boolean hasSufficientFunds(int userFunds, int price, int quantity) {

@@ -5,8 +5,8 @@ import org.cardvault.core.database.SQLConnectionPool;
 import org.cardvault.core.dependencyInjection.annotations.Injected;
 import org.cardvault.core.logging.Logger;
 import org.cardvault.user.data.UserDTO;
-import org.cardvault.userCollection.data.CollectionData;
-import org.cardvault.userCollection.data.UserCardData;
+import org.cardvault.userCollection.data.UserCardDataDTO;
+import org.cardvault.userCollection.data.CollectionDataDTO;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -62,12 +62,12 @@ public class UserCollectionRepository {
         }
     }
 
-    public List<UserCardData> getUserCollection(String username) {
+    public List<UserCardDataDTO> getUserCollection(String username) {
         String sql = "SELECT c.id, c.name, c.rarity, c.hp, c.dmg, c.collection, c.release_number, uc.quantity, uc.first_acquired " +
                 "FROM user_collection uc " +
                 "JOIN cards c ON uc.card_id = c.id " +
                 "WHERE uc.user_id = (SELECT id FROM users WHERE username = ?)";
-        List<UserCardData> userCollection = new ArrayList<>();
+        List<UserCardDataDTO> userCollection = new ArrayList<>();
 
         try (Connection conn = connectionPool.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -85,12 +85,12 @@ public class UserCollectionRepository {
                         rs.getString("collection"),
                         rs.getInt("release_number")
                 );
-                UserCardData userCardData = new UserCardData(
+                UserCardDataDTO userCardDataDTO = new UserCardDataDTO(
                         card,
                         rs.getInt("quantity"),
                         rs.getTimestamp("first_acquired").toLocalDateTime()
                 );
-                userCollection.add(userCardData);
+                userCollection.add(userCardDataDTO);
             }
         } catch (SQLException e) {
             Logger.error("Error fetching user collection: " + e.getMessage());
@@ -99,7 +99,7 @@ public class UserCollectionRepository {
         return userCollection;
     }
 
-    public CollectionData getUserCollectionData(String username) {
+    public CollectionDataDTO getUserCollectionData(String username) {
         String sql = "SELECT " +
                 "(SELECT COUNT(DISTINCT id) FROM cards) AS totalCards, " +
                 "SUM(uc.quantity) AS totalCardsCollected, " +
@@ -120,7 +120,7 @@ public class UserCollectionRepository {
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {
-                return new CollectionData(
+                return new CollectionDataDTO(
                         rs.getInt("totalCards"),
                         rs.getInt("totalCardsCollected"),
                         rs.getInt("commonCount"),

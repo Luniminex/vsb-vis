@@ -1,9 +1,9 @@
 package org.cardvault.packTypes.core;
 
 import com.sun.net.httpserver.HttpExchange;
-import org.cardvault.cards.data.BuyPackDTO;
+import org.cardvault.packTypes.data.BuyPackDTO;
 import org.cardvault.cards.data.CardDOM;
-import org.cardvault.cards.data.OpenPackDTO;
+import org.cardvault.packTypes.data.OpenPackDTO;
 import org.cardvault.core.dependencyInjection.annotations.Injected;
 import org.cardvault.core.logging.Logger;
 import org.cardvault.core.routing.Response;
