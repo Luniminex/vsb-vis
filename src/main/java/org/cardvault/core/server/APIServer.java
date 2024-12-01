@@ -77,7 +77,6 @@ public class APIServer {
         controllerRouter.registerController(UserPacksController.class);
         controllerRouter.registerController(UserCollectionController.class);
     }
-
     private static void injectServices() {
         // Inject dependencies into all registered services and controllers
         diContainer.getRegisteredServices().forEach((key, service) -> diContainer.injectDependencies(service));

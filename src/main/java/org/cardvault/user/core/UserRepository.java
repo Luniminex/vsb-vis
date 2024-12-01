@@ -10,7 +10,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-//active record
+//Data mapper
 public class UserRepository {
     private SQLConnectionPool connectionPool;
 
