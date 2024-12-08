@@ -19,5 +19,15 @@
         </library>
       </libraries>
     </data-source>
+    <data-source source="LOCAL" name="cardvault.db" uuid="1a5fbe3e-f520-414e-b467-2cbd7774a09d">
+      <driver-ref>sqlite.xerial</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
+      <jdbc-url>jdbc:sqlite:db/cardvault.db</jdbc-url>
+      <jdbc-additional-properties>
+        <property name="com.intellij.clouds.kubernetes.db.enabled" value="false" />
+      </jdbc-additional-properties>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>

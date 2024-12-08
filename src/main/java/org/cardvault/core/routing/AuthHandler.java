@@ -45,7 +45,6 @@ public class AuthHandler {
 
         String username = credentials.username();
         String password = credentials.password();
-        //TODO: when you have card collection repo get correct values
         return new UserDTO(username, password, 0, 0, 0);
     }
 }

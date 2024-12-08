@@ -28,10 +28,12 @@ public class PackTypesController {
     public void setPackTypeService(PackTypeService packTypeService) {
         this.packTypeService = packTypeService;
     }
+
     @Route(path = "/buy", method = "POST")
     @Authorized
     public Response buyPack(HttpExchange exchange, UserDTO userDTO, BuyPackDTO buyPackDTO) {
         Logger.debug("Received buy pack request.");
+
         if(packTypeService.buyPack(userDTO, buyPackDTO)) {
             Logger.debug(userDTO.username() + " bought " + buyPackDTO.quantity() +" pack(s) " + buyPackDTO.id());
             return Response.ok("Packs bought.");
@@ -46,6 +48,7 @@ public class PackTypesController {
     public Response openPack(HttpExchange exchange, UserDTO userDTO, OpenPackDTO openPackDTO) {
         Logger.debug("Received open pack request.");
         List<CardDOM> cards = packTypeService.openPack(userDTO, openPackDTO.packTypeId());
+
         if(cards != null) {
             Logger.debug(userDTO.username() + " opened pack " + openPackDTO.packTypeId());
             return Response.ok(cards);
